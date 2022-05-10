@@ -1,4 +1,4 @@
-package com.epam.esm.domain.gift_certificate;
+package com.epam.esm.dto;
 
 import com.epam.esm.domain.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,7 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class GiftCertificate {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class GiftCertificateDTO {
 
     private UUID id;
     private String name;
@@ -28,7 +29,12 @@ public class GiftCertificate {
     private LocalDateTime createDate;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss:SSS")
     private LocalDateTime lastUpdateDate;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Tag> tags;
 
+    public GiftCertificateDTO(String name, String description, BigDecimal price, Integer duration) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.duration = duration;
+    }
 }
