@@ -3,9 +3,7 @@ package com.epam.esm.dao.giftCertificate;
 import com.epam.esm.config.TestConfig;
 import com.epam.esm.dao.gift_certificate.GiftCertificateDAOImpl;
 import com.epam.esm.domain.gift_certificate.GiftCertificate;
-import com.epam.esm.domain.tag.Tag;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,9 +17,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
