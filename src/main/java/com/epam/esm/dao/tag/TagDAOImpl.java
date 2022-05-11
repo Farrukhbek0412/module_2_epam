@@ -29,10 +29,12 @@ public class TagDAOImpl implements TagDAO {
             jdbcTemplate.update(QUERY_CREATE_TAG, tag.getId(), tag.getName());
             return tag;
         }catch (DataIntegrityViolationException e){
-            log.error(e.getLocalizedMessage());
-            throw new TagAlreadyExistException("tag (name = " + tag.getName() + "\" ) already exists");
+            log.info(e.getLocalizedMessage());
+            throw new TagAlreadyExistException("tag (name = " + tag.getName() + " ) already exists");
         }
     }
+
+
 
     @Override
     public Tag get(UUID tagId) {
@@ -40,10 +42,11 @@ public class TagDAOImpl implements TagDAO {
         try{
             return jdbcTemplate.queryForObject(QUERY_GET_TAG, new TagMapper(), tagId);
         }catch (EmptyResultDataAccessException e){
-            log.error(e.getLocalizedMessage());
+            log.info(e.getLocalizedMessage());
             throw new DataNotFoundException("Tag (id = " + tagId +" ) is not found" );
         }
     }
+
 
     @Override
     public List<Tag> getAll() {
@@ -72,7 +75,7 @@ public class TagDAOImpl implements TagDAO {
         try {
             return jdbcTemplate.queryForObject(QUERY_GET_TAG_BY_NAME, new TagMapper() ,tagName);
         } catch (EmptyResultDataAccessException e) {
-            log.error(e.getLocalizedMessage());
+            log.info(e.getLocalizedMessage());
             throw new DataNotFoundException("Tag ( name=" + tagName +" ) is not found");
         }
     }

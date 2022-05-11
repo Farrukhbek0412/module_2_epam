@@ -9,6 +9,7 @@ import com.epam.esm.exception.DataNotFoundException;
 import com.epam.esm.exception.UnknownDatabaseException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -19,25 +20,35 @@ import java.util.UUID;
 
 @Repository
 @Slf4j
-@AllArgsConstructor
 public class GiftCertificateDAOImpl implements GiftCertificateDAO {
 
     private final JdbcTemplate jdbcTemplate;
+    @Autowired
+    public GiftCertificateDAOImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public GiftCertificate create(GiftCertificate certificate) {
-        String QUERY_CREATE_CERTIFICATE = """
-                insert into gift_certificate(id, name, description, price, duration, create_date, last_update_date)
-                            values(?, ?, ?, ?, ?, ?, ?);""";
+        String query =
+                "insert into gift_certificate(id, name, description, price, duration, " +
+                        "created_date, last_updated_date) values(?, ?, ?, ?, ?, ?, ?)";
 
         try {
-            jdbcTemplate.update(QUERY_CREATE_CERTIFICATE,
-                    certificate.getId(), certificate.getName(), certificate.getDescription(), certificate.getPrice(),
-                    certificate.getDuration(), certificate.getCreateDate(), certificate.getLastUpdateDate());
-        return certificate;
-        } catch (Exception ex){
-            log.error(ex.getLocalizedMessage());
-            throw new BaseException(400, "certificate ( name =" + certificate.getName() + " is already exist");
+            jdbcTemplate.update(
+                    query,
+                    certificate.getId(),
+                    certificate.getName(),
+                    certificate.getDescription(),
+                    certificate.getPrice(),
+                    certificate.getDuration(),
+                    certificate.getCreateDate(),
+                    certificate.getLastUpdateDate());
+
+            return certificate;
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
+            throw new BaseException(400, "certificate ( name =" + certificate.getName() + ") is already exist");
         }
     }
 
@@ -45,7 +56,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
 
     @Override
     public GiftCertificate get(UUID id) {
-        String QUERY_GET_CERTIFICATE = "select * from gift_certificate where id = ?;";
+        String QUERY_GET_CERTIFICATE = "select * from gift_certificate where id = ?";
         try {
             return jdbcTemplate.queryForObject(
                     QUERY_GET_CERTIFICATE,
@@ -57,9 +68,10 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
         }
     }
 
+
     @Override
     public List<GiftCertificate> getAll() {
-        String QUERY_GET_ALL = "select * from gift_certificate;";
+        String QUERY_GET_ALL = "select * from gift_certificate";
         try {
             return jdbcTemplate.query(QUERY_GET_ALL, new GiftCertificateMapper());
         } catch (Exception e){
@@ -91,7 +103,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
                 price = ?,
                 duration = ?,
                 last_update_date = ?
-                where id = ?;
+                where id = ?
                 """;
         int updateResult = jdbcTemplate.update(
                 QUERY_UPDATE_CERTIFICATE,
@@ -130,7 +142,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     @Override
     @Transactional
     public void createTagsWithGiftCertificate(UUID certificateId, List<Tag> tags) {
-        String QUERY_CREATE_TAG = "insert into tag (id, name) values(?, ?);";
+        String QUERY_CREATE_TAG = "insert into tag (id, name) values(?, ?)";
         String QUERY_CREATE_CONNECTION
                 = "insert into gift_certificate_tag (tag_id, gift_certificate_id) values (?, ?);";
 
