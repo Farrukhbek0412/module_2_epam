@@ -16,12 +16,6 @@ import lombok.Setter;
 public class BaseResponseDTO<T> {
 
     private int status;
-    /**
-     status type:
-     -1 -> operation failed
-     0 -> operation done successfully, but no data found
-     1 -> operation done successfully
-     */
     private String message;
     private T data;
 

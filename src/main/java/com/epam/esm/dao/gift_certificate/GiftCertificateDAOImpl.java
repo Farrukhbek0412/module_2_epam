@@ -4,9 +4,11 @@ import com.epam.esm.domain.gift_certificate.GiftCertificate;
 import com.epam.esm.domain.gift_certificate.GiftCertificateMapper;
 import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.domain.tag.TagMapper;
+import com.epam.esm.exception.BaseException;
 import com.epam.esm.exception.DataNotFoundException;
 import com.epam.esm.exception.UnknownDatabaseException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@Slf4j
 @AllArgsConstructor
 public class GiftCertificateDAOImpl implements GiftCertificateDAO {
 
@@ -27,11 +30,18 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
                 insert into gift_certificate(id, name, description, price, duration, create_date, last_update_date)
                             values(?, ?, ?, ?, ?, ?, ?);""";
 
-        jdbcTemplate.update(QUERY_CREATE_CERTIFICATE,
-                certificate.getId(), certificate.getName(), certificate.getDescription(), certificate.getPrice(),
-                certificate.getDuration(), certificate.getCreateDate(), certificate.getLastUpdateDate());
+        try {
+            jdbcTemplate.update(QUERY_CREATE_CERTIFICATE,
+                    certificate.getId(), certificate.getName(), certificate.getDescription(), certificate.getPrice(),
+                    certificate.getDuration(), certificate.getCreateDate(), certificate.getLastUpdateDate());
         return certificate;
+        } catch (Exception ex){
+            log.error(ex.getLocalizedMessage());
+            throw new BaseException(400, "certificate ( name =" + certificate.getName() + " is already exist");
+        }
     }
+
+
 
     @Override
     public GiftCertificate get(UUID id) {
@@ -42,6 +52,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
                     new GiftCertificateMapper(), id
             );
         } catch (EmptyResultDataAccessException e) {
+            log.error(e.getLocalizedMessage());
             throw new DataNotFoundException("no certificate found with id: " + id);
         }
     }
@@ -49,8 +60,13 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     @Override
     public List<GiftCertificate> getAll() {
         String QUERY_GET_ALL = "select * from gift_certificate;";
-        return jdbcTemplate.query(QUERY_GET_ALL, new GiftCertificateMapper());
-    }
+        try {
+            return jdbcTemplate.query(QUERY_GET_ALL, new GiftCertificateMapper());
+        } catch (Exception e){
+            log.error(e.getLocalizedMessage());
+            throw new UnknownDatabaseException("There is not any gift in the database!!");
+        }
+        }
 
     @Override
     @Transactional
@@ -61,7 +77,8 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
             jdbcTemplate.update(QUERY_DELETE_CONNECTIONS, id);
             return jdbcTemplate.update(QUERY_DELETE_CERTIFICATE, id);
         } catch (Exception e) {
-            throw new DataNotFoundException("gift certificate with id " + id + " is not found");
+            log.error(e.getLocalizedMessage());
+            throw new DataNotFoundException("certificate (id =" + id + " ) is not found");
         }
     }
 
@@ -86,7 +103,10 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
                 update.getId());
         if(updateResult == 1)
             return 1;
-        throw new DataNotFoundException("gift certificate with id " + update.getId() + " is not found");
+        else{
+            log.info("gift certificate (id =" + update.getId()+" ) is not found");
+            throw new DataNotFoundException("gift certificate (id =" + update.getId()+" ) is not found");
+        }
     }
 
 
@@ -102,6 +122,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
                     searchWord,
                     tagName);
         } catch (EmptyResultDataAccessException e){
+            log.error(e.getLocalizedMessage());
             throw new DataNotFoundException("no matching gift certificate found");
         }
     }
@@ -114,18 +135,19 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
                 = "insert into gift_certificate_tag (tag_id, gift_certificate_id) values (?, ?);";
 
         tags.forEach(tag -> {
-            Tag byName;
+            Tag tagByName;
             try {
-                byName = jdbcTemplate.queryForObject("select * from tag where name = ?", new TagMapper(), tag.getName());
+                tagByName = jdbcTemplate.queryForObject("select * from tag where name = ?", new TagMapper(), tag.getName());
             } catch (Exception e) {
-                byName = null;
+                tagByName = null;
+                log.error(e.getLocalizedMessage());
             }
 
-            if(byName == null){
+            if(tagByName == null){
                 tag.setId(UUID.randomUUID());
                 jdbcTemplate.update(QUERY_CREATE_TAG, tag.getId(), tag.getName());
             } else
-                tag.setId(byName.getId());
+                tag.setId(tagByName.getId());
             jdbcTemplate.update(QUERY_CREATE_CONNECTION, tag.getId(), certificateId);
         });
     }
