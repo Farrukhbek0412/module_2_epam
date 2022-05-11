@@ -3,8 +3,10 @@ package com.epam.esm.dao.tag;
 import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.domain.tag.TagMapper;
 import com.epam.esm.exception.DataNotFoundException;
+import com.epam.esm.exception.UnknownDatabaseException;
 import com.epam.esm.exception.tags.TagAlreadyExistException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@Slf4j
 @AllArgsConstructor
 public class TagDAOImpl implements TagDAO {
 
@@ -26,7 +29,8 @@ public class TagDAOImpl implements TagDAO {
             jdbcTemplate.update(QUERY_CREATE_TAG, tag.getId(), tag.getName());
             return tag;
         }catch (DataIntegrityViolationException e){
-            throw new TagAlreadyExistException("tag with name \"" + tag.getName() + "\" already exists");
+            log.error(e.getLocalizedMessage());
+            throw new TagAlreadyExistException("tag (name = " + tag.getName() + "\" ) already exists");
         }
     }
 
@@ -36,15 +40,21 @@ public class TagDAOImpl implements TagDAO {
         try{
             return jdbcTemplate.queryForObject(QUERY_GET_TAG, new TagMapper(), tagId);
         }catch (EmptyResultDataAccessException e){
-            throw new DataNotFoundException("Tag is not found with id: " + tagId);
+            log.error(e.getLocalizedMessage());
+            throw new DataNotFoundException("Tag (id = " + tagId +" ) is not found" );
         }
     }
 
     @Override
     public List<Tag> getAll() {
         String QUERY_GET_ALL = "select * from tag;";
-        return jdbcTemplate.query(QUERY_GET_ALL, new TagMapper());
-    }
+        try {
+            return jdbcTemplate.query(QUERY_GET_ALL, new TagMapper());
+        } catch (Exception e){
+            log.error(e.getLocalizedMessage());
+            throw new UnknownDatabaseException("There is not any tag in the database");
+        }
+        }
 
     @Override
     public int delete(UUID tagId) {
@@ -52,7 +62,8 @@ public class TagDAOImpl implements TagDAO {
         try {
         return jdbcTemplate.update(QUERY_DELETE_TAG, tagId);
         } catch (Exception e) {
-            throw new DataNotFoundException("tag with id " + tagId + " is not found");
+            log.error(e.getLocalizedMessage());
+            throw new DataNotFoundException("tag (id =" + tagId + " ) is not found");
         }
     }
     @Override
@@ -61,7 +72,8 @@ public class TagDAOImpl implements TagDAO {
         try {
             return jdbcTemplate.queryForObject(QUERY_GET_TAG_BY_NAME, new TagMapper() ,tagName);
         } catch (EmptyResultDataAccessException e) {
-            throw new DataNotFoundException("Tag is not found with name: " + tagName);
+            log.error(e.getLocalizedMessage());
+            throw new DataNotFoundException("Tag ( name=" + tagName +" ) is not found");
         }
     }
 
@@ -71,7 +83,8 @@ public class TagDAOImpl implements TagDAO {
         try {
             return jdbcTemplate.query(QUERY_GET_GIFT_CERTIFICATE_BY_TAG, new TagMapper(), id);
         } catch (Exception e) {
-            throw new DataNotFoundException("tag with id " + id + " is not found");
+            log.error(e.getLocalizedMessage());
+            throw new DataNotFoundException("tag (id =" + id + " ) is not found");
         }
     }
 
