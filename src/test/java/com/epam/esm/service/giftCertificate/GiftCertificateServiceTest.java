@@ -4,6 +4,8 @@ import com.epam.esm.dao.gift_certificate.GiftCertificateDAO;
 import com.epam.esm.domain.gift_certificate.GiftCertificate;
 import com.epam.esm.dto.BaseResponseDTO;
 import com.epam.esm.dto.GiftCertificateDTO;
+import com.epam.esm.exception.BaseException;
+import com.epam.esm.exception.DataNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,8 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,10 +96,22 @@ public class GiftCertificateServiceTest {
         assertEquals(200, update.getStatus());
         assertEquals("success", update.getMessage());
         verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
-         verify(giftCertificateDao, times(1)).update(giftCertificate);
+        verify(giftCertificateDao, times(1)).update(giftCertificate);
     }
 
+    @Test
+    public void testUpdateGiftCertificateThrowsException() {
+        given(giftCertificateDao.get(giftCertificate.getId())).willReturn(giftCertificate); //old
+        given(modelMapper.getConfiguration()).willReturn(new InheritingConfiguration());
+        doNothing().when(modelMapper).map(giftCertificateDto, giftCertificate);
+        giftCertificateDto.setId(giftCertificate.getId());
 
+        given(giftCertificateDao.update(giftCertificate)).willReturn(0);
+
+        assertThrows(DataNotFoundException.class, () -> giftCertificateService.update(giftCertificateDto));
+        verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
+        verify(giftCertificateDao, times(1)).update(giftCertificate);
+    }
 
     @Test
     public void testGetAllGiftCertificates() {
@@ -132,6 +145,14 @@ public class GiftCertificateServiceTest {
 
         assertEquals(200, delete.getStatus());
         assertEquals("success", delete.getMessage());
-        //verify(giftCertificateDao, times(1)).delete(giftCertificate.getId());
+        verify(giftCertificateDao, times(1)).delete(giftCertificate.getId());
+    }
+
+    @Test
+    public void testDeleteGiftCertificateThrowsException() {
+        given(giftCertificateDao.delete(giftCertificate.getId())).willReturn(0);
+
+        assertThrows(DataNotFoundException.class, () -> giftCertificateService.delete(giftCertificate.getId()));
+        verify(giftCertificateDao, times(1)).delete(giftCertificate.getId());
     }
 }

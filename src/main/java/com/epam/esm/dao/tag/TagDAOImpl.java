@@ -33,7 +33,7 @@ public class TagDAOImpl implements TagDAO {
         try{
             jdbcTemplate.update(QUERY_CREATE_TAG, tag.getId(), tag.getName());
             return tag;
-        }catch (DataIntegrityViolationException e){
+        }catch (Exception e){
             log.error(e.getLocalizedMessage());
             throw new TagAlreadyExistException("tag (name = " + tag.getName() + " ) already exists");
         }
