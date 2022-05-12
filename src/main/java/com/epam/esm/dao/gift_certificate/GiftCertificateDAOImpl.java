@@ -31,7 +31,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     public GiftCertificate create(GiftCertificate certificate) {
         String query =
                 "insert into gift_certificate(id, name, description, price, duration, " +
-                        "created_date, last_updated_date) values(?, ?, ?, ?, ?, ?, ?)";
+                        "create_date, last_update_date) values(?, ?, ?, ?, ?, ?, ?)";
 
         try {
             jdbcTemplate.update(
