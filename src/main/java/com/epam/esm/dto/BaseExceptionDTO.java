@@ -21,4 +21,7 @@ public class BaseExceptionDTO{
         this.HttpStatus = status;
         this.message = message;
     }
+    public BaseExceptionDTO(String message){
+        this.message=message;
+    }
 }
