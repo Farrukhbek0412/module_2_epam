@@ -4,8 +4,6 @@ import com.epam.esm.dao.tag.TagDAO;
 import com.epam.esm.dto.BaseResponseDTO;
 import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.exception.DataNotFoundException;
-import com.epam.esm.exception.UnknownDatabaseException;
-import com.epam.esm.service.tag.TagServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

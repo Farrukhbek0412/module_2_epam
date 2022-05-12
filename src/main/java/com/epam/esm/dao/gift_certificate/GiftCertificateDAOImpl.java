@@ -4,7 +4,6 @@ import com.epam.esm.domain.gift_certificate.GiftCertificate;
 import com.epam.esm.domain.gift_certificate.GiftCertificateMapper;
 import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.domain.tag.TagMapper;
-import com.epam.esm.exception.BaseException;
 import com.epam.esm.exception.DataNotFoundException;
 import com.epam.esm.exception.UnknownDatabaseException;
 import com.epam.esm.exception.gift_certificate.InvalidCertificationException;

@@ -4,7 +4,6 @@ import com.epam.esm.dao.gift_certificate.GiftCertificateDAO;
 import com.epam.esm.domain.gift_certificate.GiftCertificate;
 import com.epam.esm.dto.BaseResponseDTO;
 import com.epam.esm.dto.GiftCertificateDTO;
-import com.epam.esm.exception.BaseException;
 import com.epam.esm.exception.DataNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -3,13 +3,9 @@ package com.epam.esm.dao.tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.epam.esm.config.TestConfig;
-import com.epam.esm.dao.tag.TagDAOImpl;
 import com.epam.esm.domain.tag.Tag;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
