@@ -94,8 +94,8 @@ public class GiftCertificateServiceTest {
 
         assertEquals(200, update.getStatus());
         assertEquals("success", update.getMessage());
-      //  verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
-      //   verify(giftCertificateDao, times(1)).update(giftCertificate);
+        verify(giftCertificateDao, times(1)).get(giftCertificate.getId());
+         verify(giftCertificateDao, times(1)).update(giftCertificate);
     }
 
 
@@ -121,7 +121,7 @@ public class GiftCertificateServiceTest {
         assertEquals(3, all.getData().size());
         assertEquals(200, all.getStatus());
         assertEquals("success", all.getMessage());
-        //verify(giftCertificateDao, times(1)).getAll();
+        verify(giftCertificateDao, times(1)).getAll();
     }
 
     @Test

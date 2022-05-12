@@ -7,6 +7,7 @@ import com.epam.esm.exception.UnknownDatabaseException;
 import com.epam.esm.exception.tags.TagAlreadyExistException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,10 +18,14 @@ import java.util.UUID;
 
 @Repository
 @Slf4j
-@AllArgsConstructor
 public class TagDAOImpl implements TagDAO {
 
     private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public TagDAOImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public Tag create(Tag tag) {
@@ -29,7 +34,7 @@ public class TagDAOImpl implements TagDAO {
             jdbcTemplate.update(QUERY_CREATE_TAG, tag.getId(), tag.getName());
             return tag;
         }catch (DataIntegrityViolationException e){
-            log.info(e.getLocalizedMessage());
+            log.error(e.getLocalizedMessage());
             throw new TagAlreadyExistException("tag (name = " + tag.getName() + " ) already exists");
         }
     }
@@ -42,7 +47,7 @@ public class TagDAOImpl implements TagDAO {
         try{
             return jdbcTemplate.queryForObject(QUERY_GET_TAG, new TagMapper(), tagId);
         }catch (EmptyResultDataAccessException e){
-            log.info(e.getLocalizedMessage());
+            log.error(e.getLocalizedMessage());
             throw new DataNotFoundException("Tag (id = " + tagId +" ) is not found" );
         }
     }

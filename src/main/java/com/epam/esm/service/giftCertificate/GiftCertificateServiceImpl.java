@@ -64,7 +64,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
     private void isValidGift(GiftCertificateDTO gc) {
         if (gc == null || gc.getName() == null || gc.getName().trim().length() == 0) {
-            log.info("This invaid certificate can not be accepted to database");
+            log.info("This invalid certificate can not be accepted to database");
             throw new BaseException(400, "invalid gift certificate name");
         }
 
@@ -131,7 +131,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
 
         if (filteredGifts.size() == 0){
             log.info("Filter does not match to any gift");
-        return new BaseResponseDTO<>(204, "no certificates found");
+        return new BaseResponseDTO<>(HttpStatus.OK.value(), "no certificates found");
     }
         log.info("gifts are sent to user that matches to given filter");
         return new BaseResponseDTO<>(HttpStatus.OK.value(), "success",

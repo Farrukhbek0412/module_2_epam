@@ -7,7 +7,6 @@ import com.epam.esm.domain.tag.TagMapper;
 import com.epam.esm.exception.BaseException;
 import com.epam.esm.exception.DataNotFoundException;
 import com.epam.esm.exception.UnknownDatabaseException;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -116,7 +115,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
         if(updateResult == 1)
             return 1;
         else{
-            log.info("gift certificate (id =" + update.getId()+" ) is not found");
+            log.error("gift certificate (id =" + update.getId()+" ) is not found");
             throw new DataNotFoundException("gift certificate (id =" + update.getId()+" ) is not found");
         }
     }
