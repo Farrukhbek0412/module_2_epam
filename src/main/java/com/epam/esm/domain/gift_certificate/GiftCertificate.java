@@ -28,7 +28,7 @@ public class GiftCertificate {
     private LocalDateTime createDate;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss:SSS")
     private LocalDateTime lastUpdateDate;
-    //@JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Tag> tags;
 
 }
