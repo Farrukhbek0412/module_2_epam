@@ -3,7 +3,7 @@ package com.epam.esm.service.tag;
 import com.epam.esm.dao.tag.TagDAO;
 import com.epam.esm.dto.BaseResponseDTO;
 import com.epam.esm.domain.tag.Tag;
-import com.epam.esm.service.tag.TagServiceImpl;
+import com.epam.esm.exception.DataNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,16 +34,15 @@ public class TagServiceTest {
     }
 
     @Test
-    public void testCreateTagMethod() {
+    public void testCreateTag() {
         given(tagDao.create(tag)).willReturn(tag);
 
         BaseResponseDTO<Tag> tagBaseResponseDto = tagService.create(tag);
 
         assertEquals(201, tagBaseResponseDto.getStatus());
         assertEquals("tag created successfully", tagBaseResponseDto.getMessage());
-        //Mockito.verify(tagDao, Mockito.times(1)).create(tag);
+        Mockito.verify(tagDao, Mockito.times(1)).create(tag);
     }
-
     @Test
     public void testGetTagById() {
         given(tagDao.get(tag.getId())).willReturn(tag);
@@ -54,6 +53,14 @@ public class TagServiceTest {
         assertEquals("success", tag1.getMessage());
         assertEquals("test-tag", tag1.getData().getName());
 
+    }
+
+    @Test
+    public void testGetTagByIdThrowsException() {
+        given(tagDao.get(tag.getId())).willReturn(null);
+
+        assertThrows(DataNotFoundException.class, () -> tagService.get(tag.getId()));
+        verify(tagDao, times(1)).get(tag.getId());
     }
 
     @Test
@@ -85,5 +92,12 @@ public class TagServiceTest {
         assertEquals(200, deleteTag.getStatus());
         assertEquals("tag deleted successfully", deleteTag.getMessage());
         Mockito.verify(tagDao, Mockito.times(1)).delete(tag.getId());
+    }
+    @Test
+    public void testDeleteTagThrowsException() {
+        given(tagDao.delete(tag.getId())).willReturn(0);
+
+        assertThrows(DataNotFoundException.class, () -> tagService.delete(tag.getId()));
+        verify(tagDao, times(1)).delete(tag.getId());
     }
 }

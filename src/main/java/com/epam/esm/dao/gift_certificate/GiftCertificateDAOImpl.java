@@ -4,9 +4,9 @@ import com.epam.esm.domain.gift_certificate.GiftCertificate;
 import com.epam.esm.domain.gift_certificate.GiftCertificateMapper;
 import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.domain.tag.TagMapper;
-import com.epam.esm.exception.BaseException;
 import com.epam.esm.exception.DataNotFoundException;
 import com.epam.esm.exception.UnknownDatabaseException;
+import com.epam.esm.exception.gift_certificate.InvalidCertificationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -31,7 +31,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     public GiftCertificate create(GiftCertificate certificate) {
         String query =
                 "insert into gift_certificate(id, name, description, price, duration, " +
-                        "created_date, last_updated_date) values(?, ?, ?, ?, ?, ?, ?)";
+                        "create_date, last_update_date) values(?, ?, ?, ?, ?, ?, ?)";
 
         try {
             jdbcTemplate.update(
@@ -47,7 +47,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
             return certificate;
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());
-            throw new BaseException(400, "certificate ( name =" + certificate.getName() + ") is already exist");
+            throw new InvalidCertificationException("certificate ( name =" + certificate.getName() + ")  already exists");
         }
     }
 
@@ -63,7 +63,7 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
             );
         } catch (EmptyResultDataAccessException e) {
             log.error(e.getLocalizedMessage());
-            throw new DataNotFoundException("no certificate found with id: " + id);
+            throw new DataNotFoundException("certificate (id = " + id+" ) is not found");
         }
     }
 
@@ -84,8 +84,8 @@ public class GiftCertificateDAOImpl implements GiftCertificateDAO {
     public int delete(UUID id) {
         String QUERY_DELETE_CERTIFICATE = "delete from gift_certificate where id = ?";
         String QUERY_DELETE_CONNECTIONS = "delete from gift_certificate_tag where gift_certificate_id = ?";
+        jdbcTemplate.update(QUERY_DELETE_CONNECTIONS, id);
         try {
-            jdbcTemplate.update(QUERY_DELETE_CONNECTIONS, id);
             return jdbcTemplate.update(QUERY_DELETE_CERTIFICATE, id);
         } catch (Exception e) {
             log.error(e.getLocalizedMessage());

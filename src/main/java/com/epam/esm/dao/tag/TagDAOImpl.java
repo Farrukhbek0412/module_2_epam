@@ -5,10 +5,8 @@ import com.epam.esm.domain.tag.TagMapper;
 import com.epam.esm.exception.DataNotFoundException;
 import com.epam.esm.exception.UnknownDatabaseException;
 import com.epam.esm.exception.tags.TagAlreadyExistException;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -33,7 +31,7 @@ public class TagDAOImpl implements TagDAO {
         try{
             jdbcTemplate.update(QUERY_CREATE_TAG, tag.getId(), tag.getName());
             return tag;
-        }catch (DataIntegrityViolationException e){
+        }catch (Exception e){
             log.error(e.getLocalizedMessage());
             throw new TagAlreadyExistException("tag (name = " + tag.getName() + " ) already exists");
         }

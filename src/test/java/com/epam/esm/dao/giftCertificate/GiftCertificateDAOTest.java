@@ -1,9 +1,8 @@
 package com.epam.esm.dao.giftCertificate;
 
 import com.epam.esm.config.TestConfig;
-import com.epam.esm.dao.gift_certificate.GiftCertificateDAOImpl;
+import com.epam.esm.dao.gift_certificate.GiftCertificateDAO;
 import com.epam.esm.domain.gift_certificate.GiftCertificate;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +17,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = { TestConfig.class },
@@ -25,7 +27,7 @@ import java.util.UUID;
 public class GiftCertificateDAOTest {
 
     @Autowired
-    private GiftCertificateDAOImpl dao;
+    private GiftCertificateDAO dao;
 
     @Resource
     private JdbcTemplate jdbcTemplate;
@@ -44,22 +46,15 @@ public class GiftCertificateDAOTest {
                 new GiftCertificate(UUID.randomUUID(), "test", "test desc", BigDecimal.valueOf(123.0), 12, LocalDateTime.now(), LocalDateTime.now(), null);
         GiftCertificate giftCertificate = dao.create(gc);
 
-        Assertions.assertEquals("test", giftCertificate.getName());
+        assertEquals("test", giftCertificate.getName());
     }
-//    @Test
-//    public void canGetGiftCertificateById() {
-//        createTestObjects();
-//        GiftCertificate gift = dao.get(UUID.fromString("64eeb184-972c-4bef-9879-c003d7352bd0"));
-//
-//        assertNotNull(gift);
-//    }
+    @Test
+    public void canGetGiftCertificateById() {
+        GiftCertificate gift = dao.get(UUID.fromString("64eeb184-f873-491a-b2cc-aaee00c26f77"));
 
+        assertNotNull(gift);
+    }
 
-//    @Test
-//    public void canDeleteTagById() {
-//        int delete = dao.delete(UUID.fromString("badc0e82-972c-4bef-9879-c003d7352bd0"));
-//        assertEquals(1, delete);
-//    }
     private void createTestObjects(){
         jdbcTemplate.update(
                 "create table gift_certificate (" +
@@ -68,8 +63,8 @@ public class GiftCertificateDAOTest {
                         "description character varying," +
                         "price numeric," +
                         "duration int," +
-                        "created_date timestamp," +
-                        "last_updated_date timestamp )");
+                        "create_date timestamp," +
+                        "last_update_date timestamp )");
 
         jdbcTemplate.update(
                 "insert into gift_certificate values('badc0e82-972c-4bef-9879-c003d7352bd0', 'gift1', 'desc1', 1.0, 10, '2022-05-09 13:54:04.985000', '2022-05-09 13:54:04.985000');\n" +

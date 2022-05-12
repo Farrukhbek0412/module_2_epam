@@ -6,7 +6,6 @@ import com.epam.esm.domain.tag.Tag;
 import com.epam.esm.exception.BaseException;
 import com.epam.esm.exception.DataNotFoundException;
 import com.epam.esm.exception.UnknownDatabaseException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

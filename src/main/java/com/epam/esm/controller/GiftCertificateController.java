@@ -1,11 +1,9 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.domain.gift_certificate.GiftCertificate;
 import com.epam.esm.dto.BaseResponseDTO;
 import com.epam.esm.dto.GiftCertificateDTO;
 import com.epam.esm.service.giftCertificate.GiftCertificateService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

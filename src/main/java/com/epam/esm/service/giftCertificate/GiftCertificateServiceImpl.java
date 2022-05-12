@@ -5,9 +5,8 @@ import com.epam.esm.dao.tag.TagDAO;
 import com.epam.esm.domain.gift_certificate.GiftCertificate;
 import com.epam.esm.dto.BaseResponseDTO;
 import com.epam.esm.dto.GiftCertificateDTO;
-import com.epam.esm.exception.BaseException;
 import com.epam.esm.exception.DataNotFoundException;
-import com.epam.esm.exception.UnknownDatabaseException;
+import com.epam.esm.exception.gift_certificate.InvalidCertificationException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class GiftCertificateServiceImpl implements GiftCertificateService{
+public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private final GiftCertificateDAO giftCertificateDao;
     private final TagDAO tagDao;
@@ -52,28 +51,29 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         GiftCertificate created = giftCertificateDao.create(map);
 
         if (created == null) {
-            log.info(giftCertificateDto.getName()+" certificate can not be created");
-            throw new UnknownDatabaseException("failed to create gift certificate");
+            log.info(giftCertificateDto.getName() + " certificate can not be created");
+            throw new InvalidCertificationException("failed to create gift certificate");
         }
 
         createTags(giftCertificateDto);
         GiftCertificateDTO certificateDto = modelMapper.map(map, GiftCertificateDTO.class);
-        log.info(giftCertificateDto.getName()+" is created");
+        log.info(giftCertificateDto.getName() + " is created");
         return new BaseResponseDTO<>(HttpStatus.CREATED.value(), "success", certificateDto);
     }
 
     private void isValidGift(GiftCertificateDTO gc) {
         if (gc == null || gc.getName() == null || gc.getName().trim().length() == 0) {
             log.info("This invalid certificate can not be accepted to database");
-            throw new BaseException(400, "invalid gift certificate name");
+            throw new InvalidCertificationException("invalid gift certificate name");
         }
 
         if (
-                (gc.getDuration()!= null && gc.getDuration() < 0)
-                        || (gc.getPrice() != null && gc.getPrice().compareTo(BigDecimal.ZERO) < 0)
-        ) {
-            log.info("price or duration of gift certificate is invalid");
-            throw new BaseException(400, "price or duration is not preferable");
+                (gc.getDuration() != null && gc.getDuration() < 0)) {
+            log.info("duration of gift certificate is invalid");
+            throw new InvalidCertificationException("duration is not preferable");
+        } else if (gc.getPrice() != null && gc.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+            log.info("price of gift certificate is invalid");
+            throw new InvalidCertificationException("price is not preferable");
         }
     }
 
@@ -87,11 +87,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
     public BaseResponseDTO<GiftCertificateDTO> get(UUID id) {
         GiftCertificate giftCertificate = giftCertificateDao.get(id);
         if (giftCertificate == null) {
-            log.info("Id = "+ giftCertificate.getId()+" certificate does not exist in the database !!!");
+            log.info("Id = " + giftCertificate.getId() + " certificate does not exist in the database !!!");
             throw new DataNotFoundException("gift certificate is not found");
         }
         GiftCertificateDTO certificateDto = modelMapper.map(giftCertificate, GiftCertificateDTO.class);
-        log.info("Certificate (id ="+giftCertificate.getId()+" ) is visible to user");
+        log.info("Certificate (id =" + giftCertificate.getId() + " ) is visible to user");
         return new BaseResponseDTO<>(HttpStatus.OK.value(), "success", certificateDto);
     }
 
@@ -100,10 +100,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         int delete = giftCertificateDao.delete(id);
 
         if (delete != 1) {
-            log.info("certificate (id = " +id + " ) does not exist in the database");
-            throw new UnknownDatabaseException("failed to delete gift certificate");
+            log.info("certificate (id = " + id + " ) does not exist in the database");
+            throw new DataNotFoundException("certificate (id =" + id + " ) is not found in the database");
         }
-        log.info("certificate (id = " +id + " ) is removed from database");
+        log.info("certificate (id = " + id + " ) is removed from database");
         return new BaseResponseDTO<>(HttpStatus.OK.value(), "success");
     }
 
@@ -129,10 +129,10 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         List<GiftCertificate> filteredGifts = giftCertificateDao.getFilteredGifts(
                 searchWord, tagName, doNameSort, doDateSort, isDescending);
 
-        if (filteredGifts.size() == 0){
+        if (filteredGifts.size() == 0) {
             log.info("Filter does not match to any gift");
-        return new BaseResponseDTO<>(HttpStatus.OK.value(), "no certificates found");
-    }
+            return new BaseResponseDTO<>(HttpStatus.OK.value(), "no certificates found");
+        }
         log.info("gifts are sent to user that matches to given filter");
         return new BaseResponseDTO<>(HttpStatus.OK.value(), "success",
                 convertToDto(addTagsToGiftCertificates(filteredGifts)));
@@ -159,15 +159,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService{
         int result = giftCertificateDao.update(old);
 
         if (result == 1) {
-            log.info("certificate (id = " +update.getId() + " is updated in the database");
+            log.info("certificate (id = " + update.getId() + " is updated in the database");
             createTags(update);
             return new BaseResponseDTO<>(HttpStatus.OK.value(), "success");
         }
-        log.info("certificate (id = " +update.getId() + " ) does not exist in the database");
-        return new BaseResponseDTO<>(500, "failed to update");
+        log.info("certificate (id = " + update.getId() + " ) does not exist in the database");
+        throw new DataNotFoundException("certificate (id = " + update.getId() + " ) does not exist in the database");
     }
 
     public LocalDateTime getCurrentTimeInIso8601() {
-        return ZonedDateTime.now( ZoneOffset.UTC ).toLocalDateTime();
+        return ZonedDateTime.now(ZoneOffset.UTC).toLocalDateTime();
     }
 }
