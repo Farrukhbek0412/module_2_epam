@@ -45,7 +45,6 @@ public class TagController {
     }
 
 
-
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE, headers = "Accept=application/json")
     public ResponseEntity<?> deleteTag(@RequestParam UUID id) {
         BaseResponseDTO<Tag> delete = tagService.delete(id);

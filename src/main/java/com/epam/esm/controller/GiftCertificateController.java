@@ -2,8 +2,11 @@ package com.epam.esm.controller;
 
 import com.epam.esm.dto.BaseResponseDTO;
 import com.epam.esm.dto.GiftCertificateDTO;
+import com.epam.esm.exception.InvalidFormatException;
 import com.epam.esm.service.giftCertificate.GiftCertificateService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +21,7 @@ public class GiftCertificateController {
     private final GiftCertificateService giftCertificateService;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, headers = "Accept=application/json")
-    public ResponseEntity<?> create(@RequestBody GiftCertificateDTO giftCertificateDto) {
+    public ResponseEntity<?> create(@RequestBody GiftCertificateDTO giftCertificateDto) throws JsonProcessingException {
         BaseResponseDTO<GiftCertificateDTO> dto = giftCertificateService.create(giftCertificateDto);
         return ResponseEntity
                 .status(dto.getStatus())
