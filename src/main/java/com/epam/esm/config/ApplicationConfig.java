@@ -14,6 +14,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 
+/**
+ * Module 2 of Epam lab
+ * Programmed by Khabibjonov Farrukhbek
+ */
 @EnableWebMvc
 @Configuration
 @ComponentScan(basePackages = "com.epam.esm")
