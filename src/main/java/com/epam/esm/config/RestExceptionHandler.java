@@ -4,16 +4,15 @@ import com.epam.esm.dto.BaseExceptionDTO;
 import com.epam.esm.exception.*;
 import com.epam.esm.exception.gift_certificate.InvalidCertificationException;
 import com.epam.esm.exception.tags.TagAlreadyExistException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
+
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import java.util.Optional;
-
 @ControllerAdvice
 public class RestExceptionHandler
         extends ResponseEntityExceptionHandler {
@@ -45,14 +44,13 @@ public class RestExceptionHandler
         return ResponseEntity.status(400).body(new BaseExceptionDTO(400, e.getMessage()));
     }
 
+    @ExceptionHandler({
+            JsonMappingException.class,
+            JsonProcessingException.class, InvalidFormatException.class
+    })
+    public final ResponseEntity<?> handleJsonException(final RuntimeException exc) {
 
-    @ExceptionHandler(InvalidFormatException.class)
-    public ResponseEntity<ErrorResponse> invalidFormatException(final InvalidFormatException e) {
-        return error(e, HttpStatus.BAD_REQUEST);
-    }
 
-    private ResponseEntity <ErrorResponse> error(final Exception exception, final HttpStatus httpStatus) {
-        final String message = Optional.ofNullable(exception.getMessage()).orElse(exception.getClass().getSimpleName());
-        return new ResponseEntity(new ErrorResponse(message), httpStatus);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new BaseExceptionDTO(HttpStatus.UNPROCESSABLE_ENTITY.value(), exc.getMessage()));
     }
 }

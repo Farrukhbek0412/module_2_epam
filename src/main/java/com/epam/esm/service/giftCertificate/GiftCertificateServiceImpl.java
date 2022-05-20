@@ -5,9 +5,11 @@ import com.epam.esm.dao.tag.TagDAO;
 import com.epam.esm.domain.gift_certificate.GiftCertificate;
 import com.epam.esm.dto.BaseResponseDTO;
 import com.epam.esm.dto.GiftCertificateDTO;
+import com.epam.esm.exception.BaseException;
 import com.epam.esm.exception.DataNotFoundException;
 import com.epam.esm.exception.gift_certificate.InvalidCertificationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -66,12 +67,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             log.info("This invalid certificate can not be accepted to database");
             throw new InvalidCertificationException("invalid gift certificate name");
         }
+        if (!NumberUtils.isParsable(String.valueOf(gc.getPrice()))) {
+            if (gc.getPrice() != null) {
+                throw new InvalidCertificationException("Price must be only numeric !!!");
+            }
+        }
+        if (!NumberUtils.isParsable(String.valueOf(gc.getDuration()))) {
+            if (gc.getDuration() != null) {
+                throw new InvalidCertificationException("Duration must be only numeric !!!");
+            }
+        }
 
-        if (
-                (gc.getDuration() != null && gc.getDuration() < 0)) {
+        if ((gc.getDuration() != null && Double.parseDouble(gc.getDuration()) < 0)) {
             log.info("duration of gift certificate is invalid");
             throw new InvalidCertificationException("duration is not preferable");
-        } else if (gc.getPrice() != null && gc.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+        } else if (gc.getPrice() != null && Double.parseDouble(gc.getPrice())< 0) {
             log.info("price of gift certificate is invalid");
             throw new InvalidCertificationException("price is not preferable");
         }

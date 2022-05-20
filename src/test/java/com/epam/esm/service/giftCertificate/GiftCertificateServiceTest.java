@@ -51,8 +51,8 @@ public class GiftCertificateServiceTest {
                 giftCertificate.getId(),
                 giftCertificate.getName(),
                 giftCertificate.getDescription(),
-                giftCertificate.getPrice(),
-                giftCertificate.getDuration(),
+                String.valueOf(giftCertificate.getPrice()),
+                String.valueOf(giftCertificate.getDuration()),
                 giftCertificate.getCreateDate(),
                 giftCertificate.getLastUpdateDate(),
                 null

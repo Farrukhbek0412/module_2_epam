@@ -10,8 +10,11 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.core.env.Environment;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
 import javax.sql.DataSource;
 
+@EnableWebMvc
 @Configuration
 @ComponentScan(basePackages = "com.epam.esm")
 @PropertySource("classpath:database.properties")
